@@ -1,125 +1,195 @@
-Perps Ops Control Tower (MVP)
+# Perps Ops Control Tower (MVP)
 
 An operations control tower for perpetual futures markets.
 
 This repository ingests live perps market data from multiple venues, stores it in Postgres, computes 1-minute market health features, and exposes everything through Metabase dashboards for operational monitoring.
 
-Built as a practical MVP to demonstrate ops depth: data reliability, market health monitoring, and early risk monitoring foundations.
+Built as a practical MVP to demonstrate operational depth: data reliability, market health monitoring, and early risk monitoring foundations.
 
-What this MVP does
-1) Live market data ingestion
+---
 
-Connects to Binance Perps via WebSocket
+## What this MVP does
 
-Connects to Hyperliquid via WebSocket (early integration)
+### 1) Live market data ingestion
+
+- Connects to **Binance Perps** via WebSocket  
+- Connects to **Hyperliquid** via WebSocket (early integration)
 
 Ingests:
+- Trades
+- L1 best bid / ask snapshots
 
-Trades
+All raw market data is written into Postgres for durability, replay, and downstream analysis.
 
-L1 best bid / ask snapshots
+---
 
-Writes raw data into Postgres for durability and replay
+### 2) Feature computation (1-minute resolution)
 
-2) Feature computation (1-minute resolution)
+- Aggregates raw L1 snapshots into **one row per minute per symbol**
+- Computes core market health features:
+  - Bid-ask spread (bps)
+  - Order book depth proxy (L1 size)
+  - Buy / sell imbalance proxy
+  - Data freshness / latency proxy
 
-Aggregates raw L1 snapshots into one row per minute per symbol
+These features form the base layer for monitoring market quality and operational health.
 
-Produces core market health features:
+---
 
-Bid ask spread (bps)
+### 3) BI dashboards (Metabase)
 
-Order book depth proxy (L1 size)
+Dashboards are designed for **ops workflows**, not trading UIs:
 
-Buy sell imbalance proxy
+- **Ops Overview**
+- **Market Health**
+- **Risk Monitor (MVP)**
 
-Data freshness / latency proxy
+---
 
-3) BI dashboards (Metabase)
+## Architecture
 
-Dashboards are designed for ops workflows, not trading UIs:
-
-Ops Overview
-
-Market Health
-
-Risk Monitor (MVP)
-
-Architecture
-
-High level data flow:
+### High-level data flow
 
 connectors/binance.py
-→ ops.raw_trades
-→ ops.raw_book_l1
+└─> ops.raw_trades
+└─> ops.raw_book_l1
 
 connectors/hyperliquid.py
-→ ops.raw_trades
-→ ops.raw_book_l1
+└─> ops.raw_trades
+└─> ops.raw_book_l1
 
 features/compute_1m.py
-→ ops.features_1m
+└─> ops.features_1m
 
 Metabase
-→ dashboards over ops schema tables
+└─> dashboards over ops schema tables
 
-All components are loosely coupled and can be run independently.
 
-Dashboards
+All components are **loosely coupled** and can be run independently.
+
+---
+
+## Dashboards
 
 Metabase dashboards included in this MVP:
 
-Ops Overview
-High level ingestion health, coverage, and freshness
+### Ops Overview
+High-level ingestion health, venue and symbol coverage, and data freshness.
 
-Market Health
-Spread behavior, imbalance, depth proxies, and volume trends
+### Market Health
+Bid-ask spread behavior, imbalance, depth proxies, and volume trends.
 
-Risk Monitor (MVP)
-Early risk indicators derived from market health signals
+### Risk Monitor (MVP)
+Early risk indicators derived from market health signals.
 
-Dashboard links (to be replaced with public Metabase links):
+Dashboard links (replace with public Metabase links if needed):
 
-Ops Overview: METABASE_DASHBOARD_LINK_1
+- Ops Overview: `METABASE_DASHBOARD_LINK_1`
+- Market Health: `METABASE_DASHBOARD_LINK_2`
+- Risk Monitor: `METABASE_DASHBOARD_LINK_3`
 
-Market Health: METABASE_DASHBOARD_LINK_2
+---
 
-Risk Monitor: METABASE_DASHBOARD_LINK_3
+## Data model
 
-Data model
+### Key tables
 
-Key tables:
+- `ops.raw_trades`  
+  Raw per-trade events from venues
 
-ops.raw_trades
-Raw per trade events from venues
+- `ops.raw_book_l1`  
+  Best bid / ask snapshots
 
-ops.raw_book_l1
-Best bid ask snapshots
+- `ops.features_1m`  
+  One-minute aggregated market health features
 
-ops.features_1m
-One minute aggregated market health features
+- `ops.risk_events`  
+  Risk event log (schema implemented, population in progress)
 
-ops.risk_events
-Risk event log (schema implemented, population in progress)
+- `ops.risk_scores`  
+  Rolling risk scores (schema implemented, population in progress)
 
-ops.risk_scores
-Rolling risk scores (schema implemented, population in progress)
+---
 
-How to run locally
-Prerequisites
+## How to run locally
 
-Docker Desktop
+### Prerequisites
 
-Python 3.10+
+- Docker Desktop
+- Python 3.10+
+- Git
 
-Git
+---
 
-1) Start Postgres and Metabase
+### 1) Start Postgres and Metabase
 
-From repo root:
+From the repo root:
 
+```bash
 docker compose up -d
 
+All components are **loosely coupled** and can be run independently.
+
+---
+
+## Dashboards
+
+Metabase dashboards included in this MVP:
+
+### Ops Overview
+High-level ingestion health, venue and symbol coverage, and data freshness.
+
+### Market Health
+Bid-ask spread behavior, imbalance, depth proxies, and volume trends.
+
+### Risk Monitor (MVP)
+Early risk indicators derived from market health signals.
+
+Dashboard links (replace with public Metabase links if needed):
+
+- Ops Overview: `METABASE_DASHBOARD_LINK_1`
+- Market Health: `METABASE_DASHBOARD_LINK_2`
+- Risk Monitor: `METABASE_DASHBOARD_LINK_3`
+
+---
+
+## Data model
+
+### Key tables
+
+- `ops.raw_trades`  
+  Raw per-trade events from venues
+
+- `ops.raw_book_l1`  
+  Best bid / ask snapshots
+
+- `ops.features_1m`  
+  One-minute aggregated market health features
+
+- `ops.risk_events`  
+  Risk event log (schema implemented, population in progress)
+
+- `ops.risk_scores`  
+  Rolling risk scores (schema implemented, population in progress)
+
+---
+
+## How to run locally
+
+### Prerequisites
+
+- Docker Desktop
+- Python 3.10+
+- Git
+
+---
+
+### 1) Start Postgres and Metabase
+
+From the repo root:
+
+```bash
+docker compose up -d
 
 This starts:
 
@@ -129,12 +199,12 @@ Metabase (connected to Postgres)
 
 2) Run data connectors
 
-Binance Perps:
+Binance Perps
 
 python connectors/binance.py
 
 
-Hyperliquid (early integration):
+Hyperliquid (early integration)
 
 python connectors/hyperliquid.py
 
@@ -143,7 +213,7 @@ python features/compute_1m.py
 
 4) Open Metabase
 
-Open browser at http://localhost:3000
+Open browser at: http://localhost:3000
 
 Connect Metabase to the Postgres database
 
@@ -153,17 +223,17 @@ Current state and roadmap
 
 This repository represents an MVP.
 
-Implemented:
+Implemented
 
-Multi venue perps ingestion
+Multi-venue perps ingestion
 
 Durable raw market data storage
 
 Market health feature computation
 
-Ops focused BI dashboards
+Ops-focused BI dashboards
 
-In progress:
+In progress
 
 Risk event generation
 
@@ -183,6 +253,6 @@ Data reliability and observability
 
 Practical market health monitoring
 
-Foundations for real time risk systems
+Foundations for real-time risk systems
 
-It is intentionally simple, explicit, and inspectable.
+The system is intentionally simple, explicit, and inspectable, with clear extension paths toward production-grade risk and alerting infrastructure.
