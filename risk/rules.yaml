@@ -1,0 +1,58 @@
+defaults:
+  lookback_minutes: 5
+  min_rows: 2
+  cooloff_minutes: 3
+
+rules:
+
+  # 1. Wide spread → poor liquidity / market stress
+  - id: wide_spread
+    desc: Bid-ask spread unusually wide
+    metric: spread_bps
+    op: ">"
+    threshold: 25
+    severity: warn
+    actions:
+      - reduce_position_size
+      - widen_slippage
+
+  # 2. Thin bid-side liquidity
+  - id: thin_bid_liquidity
+    desc: Weak bid-side depth near mid
+    metric: depth_10bps_bid
+    op: "<"
+    threshold: 5
+    severity: warn
+    actions:
+      - limit_long_entries
+
+  # 3. Thin ask-side liquidity
+  - id: thin_ask_liquidity
+    desc: Weak ask-side depth near mid
+    metric: depth_10bps_ask
+    op: "<"
+    threshold: 5
+    severity: warn
+    actions:
+      - limit_short_entries
+
+  # 4. Order book imbalance spike
+  - id: orderbook_imbalance
+    desc: Strong order book imbalance detected
+    metric: imbalance
+    op: "abs>"
+    threshold: 0.7
+    severity: info
+    actions:
+      - monitor_only
+
+  # 5. Data freshness / infra risk
+  - id: stale_market_data
+    desc: Market data feed appears stale
+    metric: freshness_ms
+    op: ">"
+    threshold: 5000
+    severity: critical
+    actions:
+      - halt_trading
+      - alert_oncall
