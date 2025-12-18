@@ -13,7 +13,7 @@ Built as a practical MVP to demonstrate operational depth: data reliability, mar
 ### 1) Live market data ingestion
 
 - Connects to **Binance Perps** via WebSocket  
-- Connects to **Hyperliquid** via WebSocket (early integration)
+- Connects to **Hyperliquid** via WebSocket (Hyperliquid connector is an early integration and demonstrates multi-venue ingestion and schema alignment. Some feeds may disconnect periodically due to upstream idle policies.)
 
 Ingests:
 - Trades
