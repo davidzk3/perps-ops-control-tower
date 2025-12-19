@@ -68,7 +68,7 @@ All components are **loosely coupled** and can be run independently.
 
 ---
 
-**Metabase dashboards included in this MVP:**
+**Metabase dashboards included in this MVP:** **[Open dashboard](http://localhost:3000/public/dashboard/fab979f3-9f69-448a-94d8-76b6eea02fc0)**
 
 ### Ops Overview
 High-level ingestion health, venue and symbol coverage, and data freshness.
@@ -79,8 +79,6 @@ Bid-ask spread behavior, imbalance, depth proxies, and volume trends.
 ### Risk Monitor (MVP)
 Early risk indicators derived from market health signals.
 
-### Dashboards used for operational monitoring
-[Open dashboard](http://localhost:3000/public/dashboard/fab979f3-9f69-448a-94d8-76b6eea02fc0)
 
 ---
 
