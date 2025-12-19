@@ -79,6 +79,8 @@ Bid-ask spread behavior, imbalance, depth proxies, and volume trends.
 ### Risk Monitor (MVP)
 Early risk indicators derived from market health signals.
 
+http://localhost:3000/public/dashboard/fab979f3-9f69-448a-94d8-76b6eea02fc0
+
 ---
 
 ## Data model
